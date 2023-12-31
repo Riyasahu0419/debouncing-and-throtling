@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Search</title>
+</head>
+<body>
+  <h1>Movie Search</h1>
+  <input type="text" id="searchInput" placeholder="Search for a movie">
+  <div id="moviesList"></div>
+
+</body>
+</html>
+  <script>
+    const debounce = (func, delay) => {
+      let timeoutId;
+      return (...args) => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+          func.apply(null, args);
+        }, delay);
+      };
+    };
+
+    const searchMovies = debounce(async (query) => {
+      try {
+        const response = await fetch(`http://www.omdbapi.com/?apikey=YOUR_API_KEY&s=${query}`);
+        const data = await response.json();
+        displayMovies(data.Search);
+      } catch (error) {
+        console.log(error);
+      }
+    }, 300);
+
+    const displayMovies = (movies) => {
+      const moviesList = document.getElementById('moviesList');
+      moviesList.innerHTML = '';                                                                                                               
+      if (movies) {
+        movies.forEach((movie) => {
+          const movieCard = document.createElement('div');
+          movieCard.textContent = movie.Title;
+          moviesList.appendChild(movieCard);
+        });
+      }
+    };
+
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (event) => {
+      const query = event.target.value;
+      searchMovies(query);
+    });
+  </script>
